@@ -1,24 +1,17 @@
 package net.mabdurrahman.gui;
 
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
+import java.util.ArrayList;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 /**
@@ -42,6 +35,8 @@ public class ChatClientGUI {
     public static JTextArea CONVERSATION_TEXTAREA;
     public static JScrollPane CONVERSATION_SCROLLPANE;
     public static JList ONLINE_NAME_LIST;
+
+
     public static JScrollPane ONLINE_SCROLLPANE;
     public static JLabel LOGGED_IN_AS_LABEL;
 
@@ -60,7 +55,7 @@ public class ChatClientGUI {
     public static void buildLoginWindow() {
         LOGIN_WINDOW = new JFrame();
         LOGIN_WINDOW.setFont(new Font("Teen", Font.PLAIN, 12));
-        LOGIN_WINDOW.setTitle("Login Frame");
+        LOGIN_WINDOW.setTitle("Chat-Room Login");
         LOGIN_WINDOW.setSize(450, 100);
         LOGIN_WINDOW.setLocation(250, 200);
         LOGIN_WINDOW.setResizable(false);
@@ -120,7 +115,7 @@ public class ChatClientGUI {
      */
     public static void buildMainWindow() {
         MAIN_WINDOW = new JFrame();
-        MAIN_WINDOW.setTitle("The Chat Box");
+        MAIN_WINDOW.setTitle("The Chat-Room");
         MAIN_WINDOW.setSize(620, 420);
         MAIN_WINDOW.setLocation(350, 200);
         MAIN_WINDOW.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -207,6 +202,7 @@ public class ChatClientGUI {
         HELP_BUTTON.setForeground(new Color(255, 255, 255));
         HELP_BUTTON.setFont(new Font("Teen", Font.PLAIN, 14));
         HELP_BUTTON.setText("Help");
+        HELP_BUTTON.addActionListener(new HelpDialog(MAIN_WINDOW, "Chat-Room Help", true));
         MAIN_WINDOW.getContentPane().add(HELP_BUTTON);
         HELP_BUTTON.setBounds(370, 135, 110, 25);
 
@@ -215,6 +211,7 @@ public class ChatClientGUI {
         ABOUT_BUTTON.setForeground(new Color(255, 255, 255));
         ABOUT_BUTTON.setFont(new Font("Teen", Font.PLAIN, 14));
         ABOUT_BUTTON.setText("About");
+        ABOUT_BUTTON.addActionListener(new AboutDialog(MAIN_WINDOW, "About Chat-Room", true));
         MAIN_WINDOW.getContentPane().add(ABOUT_BUTTON);
         ABOUT_BUTTON.setBounds(490, 135, 110, 25);
 
@@ -262,15 +259,18 @@ public class ChatClientGUI {
 
         //String[] testNames = {"Bob Jones", "Sue Jackson", "Pat Boone", "James Brown"};
         ONLINE_NAME_LIST = new JList();
+        //ONLINE_NAME_LIST = new ArrayList<String>();
+        //ONLINE_NAME_LIST.addAll(ChatServer.CURRENT_USERS);
         ONLINE_NAME_LIST.setForeground(new Color(0, 0, 255));
         //ONLINE_NAME_LIST.setListData(testNames);
+
 
         ONLINE_SCROLLPANE = new JScrollPane();
         ONLINE_SCROLLPANE.setHorizontalScrollBarPolicy
                 (ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         ONLINE_SCROLLPANE.setVerticalScrollBarPolicy
                 (ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        ONLINE_SCROLLPANE.setViewportView(ONLINE_NAME_LIST);
+       ONLINE_SCROLLPANE.setViewportView(ONLINE_NAME_LIST);
         MAIN_WINDOW.getContentPane().add(ONLINE_SCROLLPANE);
         ONLINE_SCROLLPANE.setBounds(470, 180, 130, 195);
         ONLINE_SCROLLPANE.setBorder(BorderFactory.createTitledBorder
@@ -335,6 +335,176 @@ public class ChatClientGUI {
         return hostName;
 
     }//end of the getHostName Method
+
+    /**
+     * AboutDialog Class -
+     */
+    static class AboutDialog extends JDialog implements ActionListener {
+        /** Instance Variable */
+        private final JButton okayButton;
+        private final JTextArea aboutTextArea;
+        private final JPanel textPanel, buttonPanel;
+
+        /**
+         * AboutDialog Constructor -
+         * @param frame - JFrame the parent frame
+         * @param title - String of the title
+         * @param modal - Boolean of the modal
+         */
+        @SuppressWarnings({"OverridableMethodCallInConstructor", "LeakingThisInConstructor"})
+        public AboutDialog(JFrame frame, String title, Boolean modal) {
+            super(frame, title, modal);
+
+            /** The following 2 lines of code creates a null icon for the JDialog */
+            Image icon = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE);
+            setIconImage(icon);
+
+            setBounds(500, 250, 400, 310);
+            StringBuilder text = new StringBuilder();
+            text.append("Chat-Room is a stand-alone application that allows \n");
+            text.append("users to message other users in the chat room.  It is\n");
+            text.append("free software.  You can distribute it and/or modify\n");
+            text.append("it under the terms of the MIT License as published in\n");
+            text.append("in this software; either version 1.0.0 of the License, \n");
+            text.append("or (at your option) any later rendition.\n\n");
+            text.append("This software is distributed in hope that it will be\n");
+            text.append("useful, but WITHOUT ANY WARRANTY; without even the\n");
+            text.append("implied warranty of MERCHANTABILITY or FITNESS FOR A\n");
+            text.append("PARTICULAR PURPOSE.\n\n");
+            text.append("@author:  Mahdi Abdurrahman\n");
+            text.append("@date:  25 May 2016\n");
+            text.append("@version:  1.0.0");
+
+            aboutTextArea = new JTextArea(30, 1);
+            aboutTextArea.setFont(new Font("Teen", Font.PLAIN, 12));
+            aboutTextArea.setText(text.toString());
+            aboutTextArea.setEditable(false);
+
+            okayButton = new JButton(" OK ");
+            okayButton.addActionListener(this);
+
+            addWindowListener(new WindowAdapter() {
+                /**
+                 * windowClosing Method -
+                 * @param we - the WindowEvent
+                 */
+                @Override
+                public void windowClosing(WindowEvent we) {
+                    Window window = we.getWindow();
+                    window.dispose();
+
+                }//end of the windowClosing Method for the Anonymous WindowAdapter
+            });//end of the Anonymous WindowAdapter
+
+            textPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+            textPanel.add(aboutTextArea);
+            //textPanel.setBackground(Color.BLUE);
+
+            buttonPanel.add(okayButton);
+            //buttonPanel.setBackground(Color.BLUE);
+
+            getContentPane().add(textPanel, BorderLayout.CENTER);
+            getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+            //setVisible(true);
+
+        }//end of the AboutDialog Constructor
+        /**
+         * actionPerformed Method -
+         * @param ae - the ActionEvent
+         */
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            if (ae.getSource() == ABOUT_BUTTON) {
+                this.setVisible(true);
+            }
+            if (ae.getSource() == okayButton) {
+                this.dispose();
+            }
+        }//end of the actionPerformed Method
+    }//end of the AboutDialog Class
+    /**
+     * HelpDialog Class -
+     */
+    static class HelpDialog extends JDialog implements ActionListener {
+        /** Instance Variable */
+        private final JButton okayButton;
+        private final JTextArea helpTextArea;
+        private final JPanel textPanel, buttonPanel;
+
+        /**
+         * HelpDialog Constructor -
+         * @param frame - the parent frame
+         * @param title - the title
+         * @param modal - the modal
+         */
+        @SuppressWarnings({"OverridableMethodCallInConstructor", "LeakingThisInConstructor"})
+        public HelpDialog(JFrame frame, String title, Boolean modal) {
+            super(frame, title, modal);
+
+            /** The following 2 lines of code creates a null icon for the JDialog */
+            Image icon = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE);
+            setIconImage(icon);
+
+            setBounds(500, 250, 450, 250);
+            StringBuilder text = new StringBuilder();
+            text.append("This program is free software.  You can distribute  it and/or \n");
+            text.append("modify it under the terms of the GNU General Public License \n");
+            text.append("as published by the Free Software Foundation; either version \n");
+            text.append("1.0.0 of the License, or (at your option) any later rendition.\n\n");
+            text.append("This program is distributed in hope that it will be useful, but \n");
+            text.append("WITHOUT ANY WARRANTY; without even the implied warranty of \n");
+            text.append("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n");
+
+            helpTextArea = new JTextArea(20, 1);
+            helpTextArea.setFont(new Font("Teen", Font.PLAIN, 12));
+            helpTextArea.setText(text.toString());
+            helpTextArea.setEditable(false);
+
+            okayButton = new JButton(" OK ");
+            okayButton.addActionListener(this);
+
+            addWindowListener(new WindowAdapter() {
+                /**
+                 * windowClosing Method -
+                 * @param we - the WindowEvent
+                 */
+                @Override
+                public void windowClosing(WindowEvent we) {
+                    Window window = we.getWindow();
+                    window.dispose();
+
+                }//end of the windowClosing Method for the Anonymous WindowAdapter
+            });//end of the Anonymous WindowAdapter
+
+            textPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+            textPanel.add(helpTextArea);
+            buttonPanel.add(okayButton);
+
+            getContentPane().add(textPanel, BorderLayout.CENTER);
+            getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+
+        }//end of the HelpDialog Constructor
+        /**
+         * actionPerformed Method -
+         * @param ae -
+         */
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            if (ae.getSource() == HELP_BUTTON) {
+                this.setVisible(true);
+
+            }
+            if (ae.getSource() == okayButton) {
+                this.dispose();
+
+            }
+        }//end of the actionPerformed Method
+    }//end of the HelpDialog Class
+
     /**
      * main Method - Contains the command line arguments
      * @param args - String[] with the command line arguments

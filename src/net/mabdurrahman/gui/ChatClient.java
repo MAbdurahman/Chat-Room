@@ -3,6 +3,7 @@ package net.mabdurrahman.gui;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Scanner;
 import javax.swing.JOptionPane;
 
@@ -39,7 +40,7 @@ public class ChatClient implements Runnable {
                 checkStream();
 
             } finally {
-                socket.close();
+             this.socket.close();
             }
 
         } catch (Exception ex) {
@@ -67,6 +68,7 @@ public class ChatClient implements Runnable {
                 temp = temp.replace("]", "");
                 String[] currentUsers = temp.split(", ");
                 ChatClientGUI.ONLINE_NAME_LIST.setListData(currentUsers);
+                //ChatClientGUI.ONLINE_NAME_LIST.addAll(Arrays.asList(currentUsers));
 
             } else {
                 ChatClientGUI.CONVERSATION_TEXTAREA.append(message + "\n");
@@ -88,9 +90,13 @@ public class ChatClient implements Runnable {
      * @throws IOException
      */
     public void disconnectFromServer() throws IOException {
+        int userName = ChatClientGUI.ONLINE_NAME_LIST.getSelectedIndex();
         String message = ChatClientGUI.USER_NAME + ", you have disconnected from The Chat Room.";
+        ChatClientGUI.ONLINE_NAME_LIST.remove(userName - 1);
         JOptionPane.showMessageDialog(null, message);
         printOut.println(ChatClientGUI.USER_NAME + " has disconnected from chat room");
+
+
         printOut.flush();
         socket.close();
         System.exit(0);

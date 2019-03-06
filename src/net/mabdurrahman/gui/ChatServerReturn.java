@@ -45,7 +45,7 @@ public class ChatServerReturn implements Runnable {
                 }
             }
             for (int i = 1; i <= ChatServer.CONNECTION_ARRAY.size(); i++) {
-                Socket tempSocket = (Socket) ChatServer.CONNECTION_ARRAY.get(i - 1);
+                Socket tempSocket = ChatServer.CONNECTION_ARRAY.get(i - 1);
                 printOut = new PrintWriter(tempSocket.getOutputStream());
                 printOut.println(tempSocket.getLocalAddress().getHostName() + " is disconnected");
                 printOut.flush();

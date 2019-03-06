@@ -46,18 +46,21 @@ public class ChatServer {
     /**
      * addUserName Method -
      * @param newSocket - the Socket of the new user
+     * @throws IOException -
      */
     public static void addUserName(Socket newSocket) throws IOException {
         Scanner inputScanner = new Scanner(newSocket.getInputStream());
         String userName = inputScanner.nextLine();
         CURRENT_USERS.add(userName);
 
-        for (int i = 1; i <= ChatServer.CONNECTION_ARRAY.size(); i++) {
-            Socket tempSocket = (Socket) ChatServer.CONNECTION_ARRAY.get(i - 1);
+       for (int i = 1; i <= ChatServer.CONNECTION_ARRAY.size(); i++) {
+            Socket tempSocket = ChatServer.CONNECTION_ARRAY.get(i - 1);
             PrintWriter printOut = new PrintWriter(tempSocket.getOutputStream());
             printOut.println("#?!" + CURRENT_USERS);
             printOut.flush();
         }
+
     }//end of the addUserName Method
+
 }//end of the ChatServer Class
 
